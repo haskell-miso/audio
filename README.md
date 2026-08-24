@@ -2,6 +2,10 @@
 
 Sample web app with audio, in Haskell, using [Miso](https://haskell-miso.org/).
 
+A Winamp-inspired audio player: playlist, transport controls, seek bar,
+volume, and a little spectrum visualizer. Audio tracks are streamed from
+[SoundHelix](https://www.soundhelix.com/audio-examples) (music by T. Schürger).
+
 
 ## Try online
 
