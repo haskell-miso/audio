@@ -49,8 +49,8 @@ data Action
   | ActionSetDuration SongId Double
 ----------------------------------------------------------------------
 -- | View
-handleView :: context -> props -> Model -> View context Model Action
-handleView _ _ model = div_ [ class_ rackClass ]
+handleView :: Model -> View context props Model Action
+handleView model = div_ [ class_ rackClass ]
   [ viewMain model
   , viewSkins model
   , viewPlaylist model
@@ -66,7 +66,7 @@ handleView _ _ model = div_ [ class_ rackClass ]
       <> (if model ^. modelStatus == Paused then " is-paused" else "")
 ----------------------------------------------------------------------
 -- | One hidden <audio> element per song, driven by the update function
-viewAudio :: Double -> SongId -> Song -> View context Model Action
+viewAudio :: Double -> SongId -> Song -> View context props Model Action
 viewAudio vol sId song = audio_
   [ id_ (songDomId sId)
   , src_ (song ^. songUrl)
@@ -79,7 +79,7 @@ viewAudio vol sId song = audio_
   []
 ----------------------------------------------------------------------
 -- | Beveled window title bar with the classic grooved stripes
-viewTitleBar :: Bool -> MisoString -> View context Model Action
+viewTitleBar :: Bool -> MisoString -> View context props Model Action
 viewTitleBar withButtons caption = header_ [ class_ "titlebar" ] $
   [ span_ [ class_ "stripes" ] []
   , span_ [ class_ "caption" ] [ text caption ]
@@ -88,7 +88,7 @@ viewTitleBar withButtons caption = header_ [ class_ "titlebar" ] $
   [ span_ [ class_ "winbtns" ] (replicate 3 (span_ [] [])) | withButtons ]
 ----------------------------------------------------------------------
 -- | Main deck: LCD display, seek bar, volume, transport buttons
-viewMain :: Model -> View context Model Action
+viewMain :: Model -> View context props Model Action
 viewMain model = section_ [ class_ "window" ]
   [ viewTitleBar True "miso amp"
   , viewDisplay model
@@ -100,7 +100,7 @@ viewMain model = section_ [ class_ "window" ]
   ]
 ----------------------------------------------------------------------
 -- | The black LCD: spectrum bars, big time readout, scrolling track title
-viewDisplay :: Model -> View context Model Action
+viewDisplay :: Model -> View context props Model Action
 viewDisplay model = div_ [ class_ "display" ]
   [ div_ [ class_ "lcd-row" ]
       [ div_ [ class_ (if isPlaying then "viz playing" else "viz") ]
@@ -139,7 +139,7 @@ viewDisplay model = div_ [ class_ "display" ]
       Nothing -> "no track"
 ----------------------------------------------------------------------
 -- | Seek bar over the current song
-viewSeek :: Model -> View context Model Action
+viewSeek :: Model -> View context props Model Action
 viewSeek model = div_ [ class_ "seek" ]
   [ input_
       [ type_ "range"
@@ -153,7 +153,7 @@ viewSeek model = div_ [ class_ "seek" ]
   where
     totalSecs = fromMaybe 0 (currentSong model >>= (^. songDuration) . snd)
 ----------------------------------------------------------------------
-viewTransport :: Model -> View context Model Action
+viewTransport :: Model -> View context props Model Action
 viewTransport _ = div_ [ class_ "transport" ]
   [ btn "Previous" "◄◄" ActionPrev
   , btn "Play" "►" ActionResume
@@ -165,7 +165,7 @@ viewTransport _ = div_ [ class_ "transport" ]
     btn name glyph action =
       button_ [ class_ "btn", textProp "title" name, onClick action ] [ text glyph ]
 ----------------------------------------------------------------------
-viewVolume :: Model -> View context Model Action
+viewVolume :: Model -> View context props Model Action
 viewVolume model = div_ [ class_ "volume" ]
   [ input_
       [ type_ "range"
@@ -178,7 +178,7 @@ viewVolume model = div_ [ class_ "volume" ]
   ]
 ----------------------------------------------------------------------
 -- | Skin selector, where the equalizer would be
-viewSkins :: Model -> View context Model Action
+viewSkins :: Model -> View context props Model Action
 viewSkins model = section_ [ class_ "window" ]
   [ viewTitleBar False "miso skins"
   , div_ [ class_ "skins" ]
@@ -193,7 +193,7 @@ viewSkins model = section_ [ class_ "window" ]
       , text (skinName skin)
       ]
 ----------------------------------------------------------------------
-viewPlaylist :: Model -> View context Model Action
+viewPlaylist :: Model -> View context props Model Action
 viewPlaylist model = section_ [ class_ "window" ]
   [ viewTitleBar False "miso amp playlist"
   , ul_ [ class_ "tracks" ]
